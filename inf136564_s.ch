@@ -121,6 +121,25 @@ void caseLoggedInUsers(User * users, int usersAmount){
     }
 }
 
+void caseGroupList(char groups[100][20], int groupsAmount){
+    Request request;
+    int requestQueue = msgget(1234, 0600);
+    int isReceived = msgrcv(requestQueue, &request, sizeof(request) - sizeof(long) + 1, 12, IPC_NOWAIT);
+    if(isReceived != -1){
+        printf("Received users_group_membership request.\n");
+        int i;
+        Response response;
+        response.value = groupsAmount;
+        response.type = 13;
+        for(i = 0; i < groupsAmount; i++){
+            strcpy(response.data[i], groups[i]);
+        }
+        if(msgsnd(requestQueue, &response, sizeof(response) - sizeof(long) + 1, 0) == -1){
+            printf("Error in resending\n");
+        }
+    }
+}
+
 void caseMessageToUserIn(User *users, int usersAmount){
     DataMessage dataMessage;
     Response response;
@@ -144,6 +163,65 @@ void caseMessageToUserIn(User *users, int usersAmount){
         }
         if(msgsnd(requestQueue, &response, sizeof(response) - sizeof(long) + 1, 0) == -1){ //sending response back to sender to say that message has been sent
             printf("Error in resending\n");
+        }
+    }
+}
+
+void caseGroupSigning(User *users, int usersAmount, char groups[100][20], int groupsAmount){
+    Request request;
+    int requestQueue = msgget(1234, 0600);
+    int isReceived = msgrcv(requestQueue, &request, sizeof(request) - sizeof(long) + 1, 8, IPC_NOWAIT);
+    if(isReceived != -1){
+        printf("Received group signing request.\n");
+        int i;
+        int j;
+        Response response;
+        response.value = 0;
+        response.type = 9;
+        for(i = 0; i < groupsAmount; i++){
+            if(strcmp(groups[i], request.data[0]) == 0){
+                for(j = 0 ; j < usersAmount; j++){
+                    if(strcmp(users[j].login, request.login) == 0){
+                        if(users[j].isInGroup == 0){
+                            response.value = 1;
+                            users[j].isInGroup = 1;
+                        }
+                        else{
+                            response.value = 2;
+                            strcpy(response.data[0], users[j].group);
+                        }
+                    }
+                }
+            }
+        }
+        if(msgsnd(requestQueue, &response, sizeof(response) - sizeof(long) + 1, 0) == -1){
+            printf("Error in resending.\n");
+        }
+    }
+}
+
+void caseSigningOutOfGroup(User *users, int usersAmount){
+    Request request;
+    int requestQueue = msgget(1234, 0600);
+    int isReceived = msgrcv(requestQueue, &request, sizeof(request) - sizeof(long) + 1, 10, IPC_NOWAIT);
+    if(isReceived != -1){
+        printf("Received signing out of group request.\n");
+        int i;
+        Response response;
+        response.value = 0;
+        response.type = 11;
+        for(i = 0; i < usersAmount; i++){
+            if(strcmp(users[i].login, request.login) == 0){
+                if(users[i].isInGroup == 1){
+                    users[i].isInGroup = 0;
+                    response.value = 1;
+                    strcpy(response.data[0], users[i].group);
+                    break;
+                }
+            }
+        }
+        if(msgsnd(requestQueue, &response, sizeof(response) - sizeof(long) + 1, 0) == -1){
+            printf("Error in resending.\n");
         }
     }
 }

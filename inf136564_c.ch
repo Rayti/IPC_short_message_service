@@ -104,6 +104,93 @@ void requestLoggedInUsers(){
     return;
 }
 
+void requestGroupList(){
+    int requestQueue = msgget(1234, 0);
+    Request request;
+    request.type = 12;
+    if (msgsnd(requestQueue, &request, sizeof(request) - sizeof(long) + 1, 0) != 0){
+            printf("Something went wrong.\n");
+    }
+    system("sleep 1");
+    Response response;
+    response.value = -1;
+    if(msgrcv(requestQueue, &response, sizeof(response) - sizeof(long) + 1, 13, 0) == -1){
+        printf("Error in getting data back.\n");
+    }
+    if(response.value > 0){
+        int i;
+        if(response.value == 1) printf("There is 1 group available:\n");
+        else printf("There are %d groups available:\n", response.value);
+        for(i = 0; i < response.value; i++){
+            printf("-- %s\n", response.data[i]);
+        }
+        return;
+    }
+    if(response.value == 0){
+        printf("There are currently no groups available.\n");
+        return;
+    }
+    printf("Error");
+    return;
+}
+
+int requestSigningUptoGroup(char * login, char * groupName){
+    int requestQueue = msgget(1234, 0);
+    Request request;
+    request.type = 8;
+    strcpy(request.login, login);
+    strcpy(request.data[0], groupName);
+    if (msgsnd(requestQueue, &request, sizeof(request) - sizeof(long) + 1, 0) != 0){
+            printf("Something went wrong.\n");
+    }
+    system("sleep 1");
+    Response response;
+    response.value = -1;
+    if(msgrcv(requestQueue, &response, sizeof(response) - sizeof(long) + 1, 9, 0) == -1){
+        printf("Error in getting data back.\n");
+    }
+    if(response.value == 0){
+        printf("Group %s does not exist!\n", groupName);
+        return 0;
+    }
+    if(response.value == 1){
+        printf("You signed up to %s!\n", groupName);
+        return 1;
+    }
+    if(response.value == 2){
+        printf("You are arleady in group %s!\n", response.data[0]);
+        return 2;
+    }
+    printf("Error!\n");
+    return -1;
+}
+
+int requestSigningOutOfGroup(char * login){
+    int requestQueue = msgget(1234, 0);
+    Request request;
+    request.type = 10;
+    strcpy(request.login, login);
+    if (msgsnd(requestQueue, &request, sizeof(request) - sizeof(long) + 1, 0) != 0){
+            printf("Something went wrong.\n");
+    }
+    system("sleep 1");
+    Response response;
+    response.value = -1;
+    if(msgrcv(requestQueue, &response, sizeof(response) - sizeof(long) + 1, 11, 0) == -1){
+        printf("Error in getting data back.\n");
+    }
+    if(response.value == 0){
+        printf("You already are not in group!\n");
+        return 0;
+    }
+    if(response.value == 1){
+        printf("You successfully signed out of group %s!\n", response.data[0]);
+        return 1;
+    }
+    printf("Error!\n");
+    return -1;
+}
+
 
 void sendMessage(char *myLogin, char * login, char * dm){
     DataMessage dataMessage;

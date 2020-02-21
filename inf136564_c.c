@@ -21,7 +21,8 @@ int main(int argc, char* argv[]){
         printf("----------\nChoose option:\n");
         printf("1 - login\n2 - logout\n"
         "3 - users logged in\n4 - send message\n"
-        "5 - show message\n"
+        "5 - show message\n6 - sign up to group\n"
+        "7 - sign out of group\n8 - available groups list\n"
         "99 - quit\n----------\n");
         scanf("%d", &option);
         switch (option){
@@ -60,7 +61,7 @@ int main(int argc, char* argv[]){
                 }
                 char userToMessage[20];
                 char dm[100];
-                printf("type in user you want to send message to: \n");
+                printf("Type in user you want to send message to: \n");
                 scanf("%s", userToMessage);
                 printf("type in message: \n");
                 scanf("%s", dm);
@@ -74,6 +75,33 @@ int main(int argc, char* argv[]){
                 }
                 receiveMessage(*myId);
                 printf("Tu2\n");
+                break;
+            }
+            case 6:{
+                if(logged == 0){
+                    printf("First you have to log in!\n");
+                    break;
+                }
+                char groupName[20];
+                printf("Type in group name you want to join: \n");
+                scanf("%s", groupName);
+                requestSigningUptoGroup(login, groupName);
+                break;
+            }
+            case 7:{
+                if(logged == 0){
+                    printf("First you have to log in!\n");
+                    break;
+                }
+                requestSigningOutOfGroup(login);
+                break;
+            }
+            case 8:{
+                if(logged == 0){
+                    printf("First you have to log in!\n");
+                    break;
+                }
+                requestGroupList();
                 break;
             }
             case 99:{
