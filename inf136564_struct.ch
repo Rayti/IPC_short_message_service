@@ -35,7 +35,7 @@ struct DataMessage{
     long type;
     char senderLogin[20];
     char receiverLogin[20];
-    char data[100];
+    char data[30];
 };
 typedef struct DataMessage DataMessage;
 

@@ -18,10 +18,11 @@ int main(int argc, char* argv[]){
     int option;
     int quit = 0;
     while(!quit){
-        printf("Choose option:\n");
+        printf("----------\nChoose option:\n");
         printf("1 - login\n2 - logout\n"
         "3 - users logged in\n4 - send message\n"
-        "99 - quit\n");
+        "5 - show message\n"
+        "99 - quit\n----------\n");
         scanf("%d", &option);
         switch (option){
             case 1:{
@@ -33,7 +34,7 @@ int main(int argc, char* argv[]){
                 scanf("%s", login);
                 printf("Podaj haslo: ");
                 scanf("%s", password);
-                if(requestLogin(login, password, myId) == 1){
+                if(requestLogin(login, password, myId) >= 1){
                     logged = 1;
                 }
                 break;
@@ -71,7 +72,8 @@ int main(int argc, char* argv[]){
                     printf("First you have to log in!\n");
                     break;
                 }
-                receiveMessage(myId);
+                receiveMessage(*myId);
+                printf("Tu2\n");
                 break;
             }
             case 99:{

@@ -116,14 +116,14 @@ void sendMessage(char *myLogin, char * login, char * dm){
             printf("Something went wrong.\n");
     }
     system("sleep 1");
-    int requestQueue = msgget(1234, 0);
+    int requestQueue = msgget(1234, 0600);
     Response response;
     response.value = -1;
     if(msgrcv(requestQueue, &response, sizeof(response) - sizeof(long) + 1, 7, 0) == -1){
         printf("Error in getting data back.\n");
     }
     if(response.value == 1){
-        printf("Successfull sent message to %s!\n", login);
+        printf("Successfully sent message to %s!\n", login);
         return;
     }
     if(response.value == 0){
@@ -134,11 +134,14 @@ void sendMessage(char *myLogin, char * login, char * dm){
     return;
 }
 
-void receiveMessage(int * id){
+void receiveMessage(int id){
     DataMessage dataMessage;
     int queue = msgget(1235,0);
-    if(msgrcv(queue, &dataMessage, sizeof(dataMessage) - sizeof(long) + 1, *id, IPC_NOWAIT) != -1){
+    if(msgrcv(queue, &dataMessage, sizeof(dataMessage) - sizeof(long) + 1, id, IPC_NOWAIT) != -1){
         printf("----------\nMessage sent by %s:\n%s\n----------\n", dataMessage.senderLogin, dataMessage.data);
     }
-    
+    else{
+    printf("Nobody messaged you.\n");
+    }
+    printf("Tu\n");
 }

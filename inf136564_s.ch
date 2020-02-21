@@ -17,7 +17,7 @@ int loadUsersFromFile(User * users){
     while(fscanf(fp, "%s %s", users[i].login, users[i].password) != EOF){
         users[i].isInGroup = 0;
         users[i].isLoggedIn = 0;
-        users[i].id = i;
+        users[i].id = i+1;
         i++;
     }
     return i;
